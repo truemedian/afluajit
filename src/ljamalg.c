@@ -88,4 +88,4 @@
 #include "lib_ffi.c"
 #include "lib_buffer.c"
 #include "lib_init.c"
-
+#include "lib_aflua.c"
