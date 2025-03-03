@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - afl
+  pull_request:
+    branches:
+      - afl
+
+jobs:
+  linux:
+    runs-on: "${{ matrix.os }}"
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    steps:
+      - uses: actions/checkout@v4
+      - name: update
+        run: sudo apt-get update && sudo apt-get upgrade -y
+      - name: install packages
+        run: sudo apt-get install -y -m -f afl++
+      - name: compiler installed
+        run: afl-clang-lto --version
+      - name: build
+        run: make amalg HOST_CC=gcc -j$(nproc)
+      - name: package
+        run: |
+          mkdir install
+          make install DESTDIR="$PWD/install"
+          echo "DEST=$PWD/install" >> $GITHUB_ENV
+          echo "PLAT=$(uname -s)-$(uname -m)" >> $GITHUB_ENV
+      - name: artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: afluajit-${{ env.PLAT }}
+          path: ${{ env.DEST }}
