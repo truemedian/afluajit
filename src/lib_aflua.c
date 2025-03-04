@@ -182,7 +182,7 @@ LJLIB_CF(aflua_run) {
         if (ret != 0) {
             const char* err = lua_tostring(L, -1);
             fprintf(stderr, "fatal: %s\n", err);
-            exit(1);
+            abort();
         }
     }
 
